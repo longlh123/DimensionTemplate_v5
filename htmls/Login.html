@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"" type="text/javascript"></script>
+	<script src = "https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js" type="text/javascript"></script>
+</head>
+
+<style type="text/css">
+	h2,label{
+		color: #0FAFA9;
+	}
+	.container {
+	    border: 3px solid #f1f1f1;
+	}
+
+	input[type=text] {
+	    width: 100%;
+	    padding: 12px 20px;
+	    margin: 8px 0;
+	    display: inline-block;
+	    border: 1px solid #ccc;
+	    box-sizing: border-box;
+	}
+
+	input[type=submit] {
+	    background-color: #3948A4;
+	    color: white;
+	    padding: 14px 20px;
+	    margin: 8px 0;
+	    border: none;
+	    cursor: pointer;
+	    width: 100%;
+	    outline: none;
+	}
+
+	input[type=submit]:hover {
+	    opacity: 0.8;
+	}
+
+	.container_logo {
+	    text-align: center;
+	    margin: 24px 0 12px 0;
+	}
+
+	img.logo_ipsos {
+	    width: 40%;
+	    border-radius: 1%;
+	}
+
+	.container_login {
+	    padding: 16px;
+	}
+
+	/* Change styles for span and cancel button on extra small screens */
+	@media screen and (max-width: 300px) {
+	    span.psw {
+	       display: block;
+	       float: none;
+	    }
+	    .cancelbtn {
+	       width: 100%;
+	    }
+	}
+</style>
+
+<script type="text/javascript">
+	function isPhoneNumber(){
+    	
+	    var isphonenumber = true; //Số điện thoại đúng
+	    
+	    var arrViettel = ['086','098','097','096','0169','0168','0167','0166','0165','0164','0163','0162'];
+	    var arrMobiFone = ['089','090','093','098','0120','0121','0122','0126','0128'];
+	    var arrVinaPhone = ['088','091','094','0123','0124','0125','0127','0129'];
+	    var arrVietnamobile = ['092','0188','0186'];
+	    var arrGmobile = ['099','0199'];
+	    var arrSPhone = ['095'];
+	    
+	    var str_headofphone = '', str_idheadofphone = '';
+	    
+	    var str_phonetype = "CELLPHONE";
+	    var str_phonenumber = document.getElementById('phone').value;
+
+	    switch(str_phonetype.toUpperCase())
+	    {
+	        case "PHONE":
+	            if(str_phonenumber.length < 6 || str_phonenumber.length > 8)
+	            {
+	                isphonenumber = false; //Số điện thoại không tồn tại
+	            }
+	            break;
+	        case "CELLPHONE":
+	            if(str_phonenumber.length < 10 || str_phonenumber.length > 11)
+	            {
+	                isphonenumber = false; //Số điện thoại không tồn tại
+	            }
+	            else
+	            {
+	                if((str_phonenumber.length === 10 && str_phonenumber.substring(0, 2) !== '08' && str_phonenumber.substring(0, 2) !== '09') || (str_phonenumber.length === 11 && str_phonenumber.substring(0, 2) !== '01'))
+	                {
+	                    isphonenumber = false; //Số điện thoại không tồn tại
+	                }
+	                else
+	                {
+	                    str_idheadofphone = str_phonenumber.substring(0, 3);
+	                    
+	                    if(str_phonenumber.length === 10)
+	                    {
+	                        str_headofphone = str_phonenumber.substring(0, 3);
+	                    }
+	                    else
+	                    {
+	                        str_headofphone = str_phonenumber.substring(0, 4)
+	                    }
+	                    
+	                    isphonenumber = false;
+	                    
+	                    switch(str_idheadofphone)
+	                    {
+	                        case '086':
+	                        case '096':
+	                        case '097':
+	                        case '098':
+	                        case '016':
+	                            //ID Viettel
+	                            for(var i = 0; i < arrViettel.length; i++)
+	                            {
+	                                if(arrViettel[i].toUpperCase() === str_headofphone.toUpperCase())
+	                                {
+	                                    isphonenumber = true;
+	                                    break;
+	                                }
+	                            }
+	                            break;
+	                       case '088':
+	                       case '089':
+	                       case '090':
+	                       case '093':
+	                       case '091':
+	                       case '094':
+	                       case '012':
+	                            //ID MobiFone
+	                            for(var i = 0; i < arrMobiFone.length; i++)
+	                            {
+	                                if(arrMobiFone[i].toUpperCase() === str_headofphone.toUpperCase())
+	                                {
+	                                    isphonenumber = true;
+	                                    break;
+	                                }
+	                            }
+	                            
+	                            if(isphonenumber === false)
+	                            {
+	                                //ID VinaPhone
+	                                for(var i = 0; i < arrVinaPhone.length; i++)
+	                                {
+	                                    if(arrVinaPhone[i].toUpperCase() === str_headofphone.toUpperCase())
+	                                    {
+	                                        isphonenumber = true;
+	                                        break;
+	                                    }
+	                                }
+	                            }
+	                            break;
+	                        case '092':
+	                        case '018':
+	                            //ID Vietnamobile
+	                            for(var i = 0; i < arrVietnamobile.length; i++)
+	                            {
+	                                if(arrVietnamobile[i].toUpperCase() === str_headofphone.toUpperCase())
+	                                {
+	                                    isphonenumber = true;
+	                                    break;
+	                                }
+	                            }
+	                            break;
+	                        case '099':
+	                        case '019':
+	                            //ID Vietnamobile
+	                            for(var i = 0; i < arrGmobile.length; i++)
+	                            {
+	                                if(arrGmobile[i].toUpperCase() === str_headofphone.toUpperCase())
+	                                {
+	                                    isphonenumber = true;
+	                                    break;
+	                                }
+	                            }
+	                            break;
+	                        case '095':
+	                            //ID SPhone
+	                            for(var i = 0; i < arrSPhone.length; i++)
+	                            {
+	                                if(arrSPhone[i].toUpperCase() === str_headofphone.toUpperCase())
+	                                {
+	                                    isphonenumber = true;
+	                                    break;
+	                                }
+	                            }
+	                            break;
+	                    }
+	                }
+	            }
+	            
+	            break;
+	    }
+	    
+	    if(!isphonenumber)
+	    {
+	    	document.getElementById("phone").value = "";
+	    }
+	    
+	    return isphonenumber;
+	};
+</script>
+
+<body>
+	<form action = 'http://barcode.bautruc.com/sms/sms.php' onsubmit="return isPhoneNumber()" method = 'get'>
+		<h2>Thông tin số điện thoại</h2>
+		<div class = 'container'>
+			<div class = 'container_logo'>
+				<img src = 'https://images.synovate.net/uschiap/VietNam/PhamHoangLong/MobileTemplateHTML/images/Ipsos_logo.png' alt = 'IPSOS' class = 'logo_ipsos' />
+			</div>
+			<div class = 'container_login'>
+				<label><b>Số điện thoại</b></label>
+	    		<input type="text" placeholder="Nhập số điện thoại" name="phone" id="phone" minLength = '10' maxLength = '11' required>
+	    		<p id="demo"></p>
+	    		<input type="submit" value = 'Xác Nhận' class = 'btn_submit'></input>
+			</div>
+		</div>
+	</form>
+</body>
+</html>

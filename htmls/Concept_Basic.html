@@ -1,0 +1,23 @@
+<mrSubTemplate>
+	<script>
+		window.onload = function(){
+		   	$("div[class='answer']").hide();
+		}
+   	</script> 
+
+    <mrRef RefType="script" src="https://images1.ipsosinteractive.com/ABC_VIETNAM/concepts/concept_template.js" type="text/javascript">jQuery Addons</mrRef>
+	   
+	<div id = 'everything_name' class = 'control_everything'>
+		<span class = 'question_banners'>
+			<mrData QuestionElement='Banner'> //Other Question Banners </mrData>
+		</span>
+		<mrData QuestionElement='Error' ShowErrors='TopMost' Class='topmosterrors'>The Top Errors</mrData>
+		<div class = 'question_label'><mrData QuestionElement='Label'/></div>
+		<div></div>
+		<div class = 'question_controls'>
+			<div class="answer" id="flash_answer">
+				<mrData QuestionElement="Controls" />
+			</div>
+		</div>
+	</div>
+</mrSubTemplate>
