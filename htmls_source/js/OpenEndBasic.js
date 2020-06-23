@@ -67,6 +67,10 @@ $(document).ready(function(){
                     hascheckbox = true;
                     checkboxes.push($(this));
                 } 
+                else if($(this).is('select'))
+                {
+                    $select = $(this);
+                }
             });
 
             if($textbox != null)
@@ -167,7 +171,7 @@ $(document).ready(function(){
             
             if($select != null)
             {
-                $select.append('<option value="--">--</option>');
+                $select.append('<option value="--" selected>--</option>');
             }
         }
     });
