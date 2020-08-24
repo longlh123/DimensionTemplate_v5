@@ -105,11 +105,10 @@ $(document).ready(function(){
                             //44 - dấu phẩy
                             //46 - dấu chấm
                             var lang = $('html').attr('lang').toLowerCase();
-                            //alert(lang + " " +  e.keyCode);
-                            var f = true;
-                            f = f && (e.keyCode >= 48 && e.keyCode <= 57);
-                            f = f && props['type'].toLowerCase() == 'long' ? e.keyCode != 44 && e.keyCode != 46
-                                        : (lang == "vi-vn" ? e.keyCode != 46 : e.keyCode != 44);
+                            var f = props['type'].toLowerCase() == 'long' ? ((e.keyCode >= 48 && e.keyCode <= 57) && e.keyCode != 44 && e.keyCode != 46)
+                                            : ((lang == "vi-vn" ? (((e.keyCode >= 48 && e.keyCode <= 57) || 
+                                            e.keyCode == 44) && e.keyCode != 46) : (((e.keyCode >= 48 && e.keyCode <= 57) 
+                                            || e.keyCode == 46) && e.keyCode != 44)));
                             //alert(f);
                             if(!f)
                             {
@@ -151,8 +150,7 @@ $(document).ready(function(){
                         });
                     } 
                 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-                
+                 
                 //Xóa giá trị tren textbox nếu checkbox được chọn
                 if(hascheckbox)
                 {
@@ -171,7 +169,7 @@ $(document).ready(function(){
             
             if($select != null)
             {
-                $select.append('<option value="--" selected>--</option>');
+                $select.append('<option value="" disabled="disabled" selected>Chọn câu trả lời...</option>');
             }
         }
     });

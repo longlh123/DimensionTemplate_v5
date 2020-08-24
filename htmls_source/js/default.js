@@ -47,4 +47,17 @@ window.onload = function(){
         elements[i].style.removeProperty("display");
         elements[i].style.removeProperty("margin-left");
     }
+
+    var elements = document.getElementsByClassName("mrMultipleText");
+
+    for(var i = 0; i < elements.length; i++)
+    {
+        elements[i].style.removeProperty("text-align");
+        elements[i].style.removeProperty("vertical-align");
+    }
+
+    
+    
+    
 }	
+

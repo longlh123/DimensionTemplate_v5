@@ -1,5 +1,5 @@
 (function($){
-
+   
 }(jQuery));
 
 $(document).ready(function(){
@@ -43,12 +43,127 @@ $(document).ready(function(){
             });
             break;
         default:
+            $(".mrQuestionTable").addClass('cat-container');
+
             cells = $(".mrQuestionTable").children().get()
-                            .map(function(span){
-                                return($(span));        
-                            });
+                    .map(function(span){
+                        var ischecked = false;
+                        
+                        $(span).addClass('cat-group');
+
+                        $(span).children().each(function(){
+
+                            if($(this).is('input:radio') || $(this).is('input:checkbox'))
+                            {
+                                if($(this).hasClass('mrSingle'))
+                                {
+                                    $(this).addClass('cat-single-item');
+                                } 
+                                if($(this).hasClass('mrMultiple'))
+                                {
+                                    $(this).addClass('cat-multiple-item');
+                                }
+                                
+                                ischecked = $(this).is(':checked');
+                            }
+                            else if($(this).is('label'))
+                            {
+                                $(this).children().each(function(){
+
+                                    if($(this).is('span') && $(this).attr('class') == "mrMultipleText")
+                                    {
+                                        if($(this).css('font-weight') == "700")
+                                        {
+                                            $(this).addClass('exclusive');
+
+                                            $(span).addClass('exclusive');
+                                        }
+                                    }
+                                });
+                            }
+                            else if($(this).is('span'))
+                            {
+                                $(this).children().each(function(){
+                                    
+                                    if($(this).is('input:text'))
+                                    {
+                                        $(this).addClass('cat-other');
+                                        
+                                        $(span).addClass('other');
+
+                                        if(!ischecked) $('.cat-other').hide();
+                                    }
+                                });
+                            }
+                        });
+
+                        return($(span));        
+                    });
             break;
     }
+
+    $('.cat-single-item').change(function(event){
+        
+        var items = $('.cat-container').children().get().filter(function(){
+
+        });
+
+        var $parent = $(this).parent();
+        /*
+        if($parent.hasClass('other'))
+        {
+            $other = $parent.find('.cat-other');
+
+            if($(this).is(':checked')) 
+            {
+                $other.show();
+            }
+            else
+            {
+                $other.hide();
+                $other.val("");
+            }
+        }
+        else if($parent.hasClass('exclusive'))
+        {
+            $('.cat-container').children().get().map(function(span){
+                
+                if($(span).prop('id') != $parent.prop('id'))
+                {
+                    $(span).children().each(function(){
+
+                        if($(this).is('input:checkbox')) $(this).prop('checked', false);
+                    });
+                    
+                    if($(span).hasClass('other'))
+                    {
+                        $other = $(span).find('.cat-other');
+
+                        $other.hide();
+                        $other.val("");
+                    }
+                }
+            });
+        }
+        
+        if(!$parent.hasClass('exclusive'))
+        {
+            $('.cat-container').children().get().map(function(span){
+                
+                if($(span).hasClass('exclusive'))
+                {
+                    $(span).children().each(function(){
+
+                        if($(this).is('input:checkbox')) $(this).prop('checked', false);
+                    });
+                } 
+            });
+        }
+        */
+    });
+
+    /*
+    console.log(cells);
     
     //Xac dinh template?
     var template = "";
@@ -267,5 +382,7 @@ $(document).ready(function(){
             }
         });
     });
+
+    */
 });
 
