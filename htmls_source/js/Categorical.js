@@ -15,374 +15,239 @@ $(document).ready(function(){
         case "table":
             $('.mrQuestionTable').css('border-collapse', 'collapse');
 
-            var nocs = 0, nors = 0;
-
-            var arr = $('.mrQuestionTable tbody tr').get() //convert jquery object to array
-                            .map(function(row){
-
-                                $(row).css('border-bottom', '1px solid #e6e6e6');
-                                nors++;
-
-                                return $(row).find('td').get() //convert jquery object to array
-                                    .map(function(cell){
-                                        
-                                        nocs++;
-
-                                        return $(cell);
-                                    });
-                            });
+            $(".mrQuestionTable").addClass('cat-container');
             
-            $.each(arr, function(key1, item1){
+            $(".mrQuestionTable").find('td').unwrap().wrap($('<tr/>'));
+            
+            var cols = [], rows = [];
+            var isgridrow = true;
 
-                $.each(item1, function(key2, item2){
+            $(".mrQuestionTable tbody tr").get().map(function(row){
+                
+                return $(row).find('td').get().map(function(cell){
+                    
+                    var arr = $(cell).prop('id').split('.');
+                    
+                    if(cols.indexOf(arr[1]) == -1) cols.push(arr[1]);
+                    if(rows.indexOf(arr[2]) == -1) rows.push(arr[2]);
 
-                    $(item2).css('width', (1.0 / (nocs / nors) * 100) + '%');
-
-                    cells.push(item2);
+                    $(row).attr('pos_1', arr[1]);
+                    $(row).attr('pos_2', arr[2]);        
                 });
+            });
+            
+            var $rows = $(".mrQuestionTable tbody tr").get();
+
+            $rows.sort(function(a, b){
+
+                var x1 = parseInt($(a).attr('pos_1')), x2 = parseInt($(b).attr('pos_1'));
+                
+                var result = x1 > x2 ? 1 : (x1 < x2) ? -1 : 0;
+                
+                return result;
+            });
+
+            $.each($rows, function(index, row) {
+                $('.mrQuestionTable tbody').append(row);
+            });
+
+            cells = $(".mrQuestionTable tbody tr").children().get().map(function(row){
+
+                var ischecked = false, isonlycat = true;
+
+                $(row).addClass('cat-group');
+
+                $(row).children().each(function(){
+
+                    if($(this).is('input:radio') || $(this).is('input:checkbox'))
+                    {
+                        if($(this).hasClass('mrSingle'))
+                        {
+                            $(this).addClass('cat-single-item');
+                        } 
+                        if($(this).hasClass('mrMultiple'))      
+                        {
+                            $(this).addClass('cat-multiple-item');
+                        }
+                        
+                        ischecked = $(this).is(':checked');
+                    }
+                    else if($(this).is('label'))
+                    {
+                        $(this).children().each(function(){
+
+                            if($(this).is('span') && $(this).attr('class') == "mrMultipleText")
+                            {
+                                if($(this).css('font-weight') == "700")
+                                {
+                                    objCatExclusives[$(row).prop('id')] = $(row);
+
+                                    $(this).addClass('exclusive');
+
+                                    $(span).addClass('exclusive');
+
+                                    isonlycat = false;
+                                }
+                            }
+                        });
+                    }
+                    else if($(this).is('span'))
+                    {
+                        $(this).children().each(function(){
+                            
+                            if($(this).is('span') && $(this).prop('class') == 'mrErrorText'){
+                                $(this).addClass('error');
+                                $(this).show();
+                            } else if($(this).is('input:text'))
+                            {
+                                objCatOthers[$(row).prop('id')] = $(row);
+
+                                $(this).addClass('cat-other');
+
+                                $(this).show();   
+                                if(!ischecked) $(this).hide();
+
+                                isonlycat = false;
+                            }
+                        });
+                    }
+                });
+
+                if(isonlycat) objCats[$(row).prop('id')] = $(row);
+
+                return($(row));        
             });
             break;
         default:
             $(".mrQuestionTable").addClass('cat-container');
 
-            cells = $(".mrQuestionTable").children().get()
-                    .map(function(span){
-                        var ischecked = false;
+            cells = $(".mrQuestionTable").children().get().map(function(span){
+
+                var ischecked = false, isonlycat = true;
+                
+                $(span).addClass('cat-group');
+
+                $(span).children().each(function(){
+
+                    if($(this).is('input:radio') || $(this).is('input:checkbox'))
+                    {
+                        if($(this).hasClass('mrSingle'))
+                        {
+                            $(this).addClass('cat-single-item');
+                        } 
+                        if($(this).hasClass('mrMultiple'))      
+                        {
+                            $(this).addClass('cat-multiple-item');
+                        }
                         
-                        $(span).addClass('cat-group');
+                        ischecked = $(this).is(':checked');
+                    }
+                    else if($(this).is('label'))
+                    {
+                        $(this).children().each(function(){
 
-                        $(span).children().each(function(){
-
-                            if($(this).is('input:radio') || $(this).is('input:checkbox'))
+                            if($(this).is('span') && $(this).attr('class') == "mrMultipleText")
                             {
-                                if($(this).hasClass('mrSingle'))
+                                if($(this).css('font-weight') == "700")
                                 {
-                                    $(this).addClass('cat-single-item');
-                                } 
-                                if($(this).hasClass('mrMultiple'))
-                                {
-                                    $(this).addClass('cat-multiple-item');
+                                    objCatExclusives[$(span).prop('id')] = $(span);
+
+                                    $(this).addClass('exclusive');
+
+                                    $(span).addClass('exclusive');
+
+                                    isonlycat = false;
                                 }
-                                
-                                ischecked = $(this).is(':checked');
-                            }
-                            else if($(this).is('label'))
-                            {
-                                $(this).children().each(function(){
-
-                                    if($(this).is('span') && $(this).attr('class') == "mrMultipleText")
-                                    {
-                                        if($(this).css('font-weight') == "700")
-                                        {
-                                            $(this).addClass('exclusive');
-
-                                            $(span).addClass('exclusive');
-                                        }
-                                    }
-                                });
-                            }
-                            else if($(this).is('span'))
-                            {
-                                $(this).children().each(function(){
-                                    
-                                    if($(this).is('input:text'))
-                                    {
-                                        $(this).addClass('cat-other');
-                                        
-                                        $(span).addClass('other');
-
-                                        if(!ischecked) $('.cat-other').hide();
-                                    }
-                                });
                             }
                         });
+                    }
+                    else if($(this).is('span'))
+                    {
+                        $(this).children().each(function(){
+                            
+                            if($(this).is('span') && $(this).prop('class') == 'mrErrorText'){
+                                $(this).addClass('error');
+                                $(this).show();
+                            } else if($(this).is('input:text'))
+                            {
+                                objCatOthers[$(span).prop('id')] = $(span);
 
-                        return($(span));        
-                    });
+                                $(this).addClass('cat-other');
+
+                                $(this).show();   
+                                if(!ischecked) $(this).hide();
+
+                                isonlycat = false;
+                            }
+                        });
+                    }
+                });
+
+                if(isonlycat) objCats[$(span).prop('id')] = $(span);
+
+                return($(span));        
+            });
             break;
     }
 
+    console.log(objCats);
+    console.log(objCatOthers);
+    console.log(objCatExclusives);
+
     $('.cat-single-item').change(function(event){
         
-        var items = $('.cat-container').children().get().filter(function(){
-
-        });
-
-        var $parent = $(this).parent();
-        /*
-        if($parent.hasClass('other'))
-        {
-            $other = $parent.find('.cat-other');
-
-            if($(this).is(':checked')) 
-            {
-                $other.show();
-            }
-            else
-            {
-                $other.hide();
-                $other.val("");
-            }
-        }
-        else if($parent.hasClass('exclusive'))
-        {
-            $('.cat-container').children().get().map(function(span){
-                
-                if($(span).prop('id') != $parent.prop('id'))
-                {
-                    $(span).children().each(function(){
-
-                        if($(this).is('input:checkbox')) $(this).prop('checked', false);
-                    });
-                    
-                    if($(span).hasClass('other'))
-                    {
-                        $other = $(span).find('.cat-other');
-
-                        $other.hide();
-                        $other.val("");
-                    }
-                }
-            });
-        }
+        var $cat_group = $(this).parent();
         
-        if(!$parent.hasClass('exclusive'))
-        {
-            $('.cat-container').children().get().map(function(span){
-                
-                if($(span).hasClass('exclusive'))
-                {
-                    $(span).children().each(function(){
+        $other = $cat_group.find('.cat-other');
+        $other.show();
 
-                        if($(this).is('input:checkbox')) $(this).prop('checked', false);
-                    });
-                } 
-            });
-        }
-        */
+        $.each(objCatOthers, function(key, cat){
+            
+            if(key != $cat_group.prop('id')) {
+
+                $oth = cat.find('.cat-other');
+                $oth.hide();
+                $oth.val("");
+
+                $err = cat.find('.mrErrorText');
+                $err.hide();
+            }
+        });
     });
 
-    /*
-    console.log(cells);
+    $('.cat-multiple-item').change(function(event){
+
+        var $cat_group = $(this).parent();
+
+        if($(this).is(':checked')){
+            $cat_group.find('.cat-other').show();
+
+            if($cat_group.hasClass('exclusive')) {
+                $.each(objCats, function(key, cat){
+                    cat.find('.cat-multiple-item').prop('checked', false);
+                });
+
+                $.each(objCatOthers, function(key, cat){
+                    cat.find('.cat-multiple-item').prop('checked', false);
+
+                    cat.find('.cat-other').hide();
+                    cat.find('.cat-other').val("");
+
+                    cat.find('.mrErrorText').hide();
+                });
+            } else {
+                $.each(objCatExclusives, function(key, cat){
+                    cat.find('.cat-multiple-item').prop('checked', false);
+                })
+            }
+        } else {
+            $cat_group.find('.cat-other').hide();
+            $cat_group.find('.cat-other').val("");
+
+            $cat_group.find('.mrErrorText').hide();
+        }
+    });
+
     
-    //Xac dinh template?
-    var template = "";
-
-    $('.content').children().each(function(){
-
-        switch($(this).attr('class'))
-        {
-            case "categorical_imagineicons":
-            case "categorical_defaulticons":
-                template = $(this).attr('class');
-                break;
-            case "categorical_scales":
-                template = $(this).attr('class');
-                $('.mrQuestionTable').addClass('cat-scales');
-                break;
-        }
-    });
-
-    //Liệt kê danh sách categories
-    $.each(cells, function(key, item){
-        
-        var $cat = null, $other = null, $error = null;
-        var iserror = false, ischecked = false, isexclusive = false, isgroup = false;
-
-        item.children().each(function(){
-            
-            if($(this).is('input:radio') || $(this).is('input:checkbox'))
-            {
-                $cat = $(this);
-
-                ischecked = $cat.is(':checked');
-            }
-            else if($(this).is('label'))
-            {
-                $(this).children().each(function(){
-
-                    if($(this).is('span') && $(this).attr('class') == "mrMultipleText")
-                    {
-                        //Determine whether a question is the single or multiple answer question.
-                        ismultiple = true;
-                        
-                        //Determine that a category is an exclusive category.
-                        //var styles = $(this).attr('style').split(';');
-                        if($(this).css('font-weight') == "700")
-                        {
-                            isexclusive = true;
-                        }
-                    }
-                });
-            }
-            else if($(this).is('span'))
-            {
-                $(this).children().each(function(){
-
-                    if($(this).is('span'))
-                    {
-                        if($(this).attr('class') == "mrErrorText")
-                        {
-                            iserror = true;
-                            $error = $(this);
-                            $(this).addClass('error');
-                        }
-                        else if($(this).attr('class') == "mrShowText")
-                        {
-                            isgroup = true;
-                        }
-                    }
-                    else if($(this).is('input:text'))
-                    {
-                        $other = $(this);
-
-                        if($other.val().length == 0 && !iserror && !ischecked) $other.css('display', 'none');
-                    }
-                });
-            }
-        });
-
-        if(!isgroup)
-        {
-            if(isexclusive)
-            {
-                objCatExclusives[$(this).attr('id')] = {
-                    'cell' : item,
-                    'cat' : $cat,
-                    'other' : $other,
-                    'error' : $error,
-                    'iserror' : iserror,
-                    'ischecked' : ischecked
-                }
-            }
-            else
-            {
-                if($other == null)
-                {
-                    if(template == "categorical_imagineicons")
-                    {
-                        item.addClass('cat-image');
-                    }
-                    else if(template == "categorical_scales")
-                    {
-                        item.addClass('cat-scales-item');
-                    }
-
-                    objCats[$(this).attr('id')] = {
-                        'cell' : item,
-                        'cat' : $cat,
-                        'other' : $other,
-                        'error' : $error,
-                        'iserror' : iserror,
-                        'ischecked' : ischecked
-                    }
-                }
-                else
-                {
-                    objCatOthers[$(this).attr('id')] = {
-                        'cell' : item,
-                        'cat' : $cat,
-                        'other' : $other,
-                        'error' : $error,
-                        'iserror' : iserror,
-                        'ischecked' : ischecked
-                    }
-                }
-            }
-        }
-    });
- 
-    $.each(objCats, function(key, item){
-
-        item['cat'].change(function(){
-
-            $.each(objCatOthers, function(k, i){
-
-                if(!ismultiple)
-                {
-                    i['other'].css('display', 'none');
-                    i['other'].val("");
-                    if (i['error'] != null) i['error'].css('display', 'none');
-                }
-            });
-
-            if(item['cat'].is(':checked')) 
-            {
-                $.each(objCatExclusives, function(k, i){
-                    
-                    i['cat'].prop('checked', false);
-                });
-            }
-        });
-    });
-
-    $.each(objCatExclusives, function(key, item){
-        
-        item['cat'].change(function(){
-            
-            if(item['cat'].is(':checked')) 
-            {
-                $.each(objCats, function(k, i){
-                    
-                    i['cat'].prop('checked', false);
-                });
-
-                $.each(objCatOthers, function(k, i){
-                    
-                    i['cat'].prop('checked', false);
-                    
-                    i['other'].css('display', 'none');
-                    i['other'].val("");
-                    if (i['error'] != null) i['error'].css('display', 'none');
-                });
-
-                $.each(objCatExclusives, function(k, i){
-                    if(key != k){
-                        i['cat'].prop('checked', false);
-                    }
-                });
-            }
-        });
-    });
-
-    $.each(objCatOthers, function(key, item){
-
-        item['cat'].change(function(){
-
-            item['other'].css('display', 'block');
-
-            if(ismultiple)
-            {
-                if(!item['cat'].is(':checked')) 
-                {
-                    item['other'].css('display', 'none');
-                    item['other'].val("");
-                    if (item['error'] != null) item['error'].css('display', 'none');
-                }
-            }
-            else
-            {
-                $.each(objCatOthers, function(k, i){
-                
-                    if(key != k)
-                    {    
-                        i['other'].css('display', 'none');
-                        i['other'].val("");
-                        if (i['error'] != null) i['error'].css('display', 'none');
-                    }
-                });
-            }
-
-            if(item['cat'].is(':checked')) 
-            {
-                $.each(objCatExclusives, function(k, i){
-                     
-                    i['cat'].prop('checked', false);
-                });
-            }
-        });
-    });
-
-    */
 });
 
