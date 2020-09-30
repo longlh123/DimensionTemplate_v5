@@ -20,7 +20,7 @@ $(document).ready(function(){
                 
                 $(row).find('td').get().map(function(cell){
                     
-                    if($(cell).find('input[type=radio]').length == 0){
+                    if($(cell).find('input[type=radio]').length + $(cell).find('input[type=checkbox]').length == 0){
                         
                         if((idx_row == 0 && $(cell).find('.mrQuestionText').length == 0) || (idx_row != 0 && $(cell).find('.mrQuestionText').length == 1)){
                             
@@ -60,12 +60,13 @@ $(document).ready(function(){
                         
                         $(cell).addClass('grid-cell');
 
-                        if($(cell).find('input[type=radio]').length == 1){
+                        if($(cell).find('input[type=radio]').length + $(cell).find('input[type=checkbox]').length == 1){
                             
                             $(cell).parent().removeClass('grid-row');
                             $(cell).parent().addClass('grid-scale');
 
-                            $item = $(cell).find('input[type=radio]');
+                            $item = $(cell).find('input[type=radio]').length == 1 ? $(cell).find('input[type=radio]') : $(cell).find('input[type=checkbox]');
+
                             $item.wrap("<span class='cat-default'/>");
                             $item.after("<label for='" + $item.prop('id') + "'></label>");
                         }
@@ -93,40 +94,6 @@ $(document).ready(function(){
 
                 idx_row++;
             });
-            
-            
-            
-            //var $header_scales = $(".mrQuestionTable tbody tr:first");
-            //$(".mrQuestionTable tbody tr:first").remove();
-            
-            /*
-            $(".mrQuestionTable tbody tr").get().map(function(row){
-                
-                if($(row).find('.mrGridCategoryText').length == 1){
-                    //$(row).removeClass('grid-row');
-                    //$(row).addClass('grid-attr');
-                    
-                    var text = $(row).find('.mrQuestionText').html();
-                    var regExp = new RegExp("<img.*?>");
-                    
-                    if(regExp.test(text)){
-                        var s1 = text.replace(regExp, "");
-                        var s2 = text.replace(s1, "");
-
-                        s1 = s1.replace(/<.*?(\/>)/, "");
-                        s1 = s1.replace(/<.*?(>)/, "");
-                        
-                        $(row).find('.mrQuestionText').html(s1 + "<br/>" + s2);
-                    }
-                    
-                    $(row).after(/"<tr class='grid-row'>" + $header_scales.html() + "</tr>");
-                } else if ($(row).find('.grid-scale').length > 0){
-                    if(!$(row).is('tr:last')){
-                        $(row).after("<tr><td style='padding:3px' colspan='" + $(row).find('.grid-scale').length + "'></td></tr>")
-                    }
-                }
-            });
-            */
             break;
     }
 });
