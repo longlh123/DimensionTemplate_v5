@@ -354,9 +354,11 @@ img{ width: 100%; }
 	word-wrap: break-word;
 }
 
+.grid-container tbody .grid-subgroup,
 .grid-container tbody .grid-attr,
-.grid-container tbody .grid-cell,
-.grid-container tbody .grid-scale {
+.grid-container tbody .grid-label,
+.grid-container tbody .grid-scale,
+.grid-container tbody .grid-cell {
 	text-align: center;
 	vertical-align: middle;
 	word-wrap: normal;
@@ -364,24 +366,18 @@ img{ width: 100%; }
 	padding: 2px;
 }
 
-.grid-container tbody .grid-attr{
-	border-top: 2px solid #047AA8;
-	border-left: 2px solid #047AA8;
-	border-right: 2px solid #047AA8;
-}
-
-.grid-container tbody tr .grid-cell:first-child,
-.grid-container tbody tr .grid-scale:first-child{
-	border-left: 2px solid #047AA8;
-}
-
-.grid-container tbody tr .grid-cell:last-child,
-.grid-container tbody tr .grid-scale:last-child{
-	border-right: 2px solid #047AA8;
+.grid-container tbody .grid-subgroup,
+.grid-container tbody .grid-attr {
+	border: 2px solid #047AA8;	
 }
 
 .grid-container tbody .grid-scale{
-	border-bottom: 2px solid #047AA8;
+	border-bottom: 2px solid #047AA8;	
+}
+
+.grid-container tbody .grid-subgroup{
+	font-weight: bold;
+	color: #047AA8;
 }
 
 .grid-container tbody .grid-attr{
@@ -389,7 +385,15 @@ img{ width: 100%; }
 	color: #fff;
 }
 
-.grid-container tbody .grid-scale{
+.grid-container tbody tr .grid-cell:first-child{
+	border-left: 2px solid #047AA8;
+}
+
+.grid-container tbody tr .grid-cell:last-child{
+	border-right: 2px solid #047AA8;
+}
+
+.grid-container tbody .grid-cell{
 	padding-top: 15px;
 }
 
