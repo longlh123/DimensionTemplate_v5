@@ -4,7 +4,8 @@ $(document).ready(function(){
 
     switch($('.mrQuestionTable').prop('tagName').toLowerCase()){
         case 'table':
-            
+            $(".mrQuestionTable").addClass('grid-container');
+
             var $header_scales = $(".mrQuestionTable tbody tr:first");
             $(".mrQuestionTable tbody tr:first").remove();
             
@@ -29,6 +30,8 @@ $(document).ready(function(){
                     $chk = $(cell).find('input[type=checkbox]');
 
                     $chk.after("<label for='" + $chk.prop('id') + "'>" + $($header_scales[0]['cells'][id[1]]).html() + "</label>");
+                
+                    $(cell).parent().hide()
                 }
             });
 
