@@ -406,6 +406,10 @@ img{ width: 100%; }
     color: #047AA8;
 }
 
+.grid-container tbody .grid-cat{
+	transition-duration: height 2s;
+}
+
 /* fonts */
 .header{
     height: 10px;
