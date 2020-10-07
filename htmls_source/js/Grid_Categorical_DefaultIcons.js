@@ -1,10 +1,10 @@
 
-
 $(document).ready(function(){
     
+    var objRows = {};
+
     switch($('.mrQuestionTable').prop('tagName').toLowerCase()){
         case 'table':
-            
             $(".mrQuestionTable").addClass('grid-container');
             
             //Check if header of grid có chứa subgroup
@@ -43,20 +43,18 @@ $(document).ready(function(){
                 } 
             });
 
-            console.log($cells);
-            console.log(objGroups);
-            console.log(objCats);
+            //console.log($cells);
+            //console.log(objGroups);
+            //console.log(objCats);
 
-            var $header_scales = $(".mrQuestionTable tbody tr:first");
             $(".mrQuestionTable tbody tr:first").remove();
-            
-            console.log($header_scales);
             
             $(".mrQuestionTable tbody").find('td').unwrap().wrap($('<tr/>'));
             $(".mrQuestionTable tbody tr td").removeAttr('style');
             
             $(".mrQuestionTable tbody tr td").find('input[type=checkbox]').wrap("<span class='cat-group'/>");
-            
+            $(".mrQuestionTable tbody tr td").find('input[type=radio]').wrap("<span class='cat-group'/>");
+
             $(".mrQuestionTable tbody tr td").find('.cat-group').get().map(function(cat){
                 
                 if($(cat).next().prop('tagName') == 'SPAN'){
@@ -65,32 +63,107 @@ $(document).ready(function(){
             });
             
             var step = 0;
+            
+            var row = -1, next_now = -1;
+            var obj_row = {}, obj_cats = {}, obj_catothers = {}, obj_catexclusives = {};
 
             $(".mrQuestionTable tbody tr td").get().map(function(cell){
                 
-                if($(cell).find('input[type=checkbox]').length == 1){
+                if($(cell).find('input[type=checkbox]').length == 1 || $(cell).find('input[type=radio]').length == 1){
                     
                     $(cell).parent().addClass('grid-cat');
                     
-                    var row = $(cell).prop('id').substring($(cell).prop('id').lastIndexOf('.') + 1, $(cell).prop('id').length);
-
+                    row = $(cell).prop('id').substring($(cell).prop('id').lastIndexOf('.') + 1, $(cell).prop('id').length);
+                    
                     $(cell).attr('row', row);
 
                     var id_cat = $(cell).prop('id');
                     id_cat = id_cat.substring(0, id_cat.lastIndexOf('.') + 1) + "0";
                     
                     if(Object.keys(objGroups).indexOf(id_cat) != -1){
-                        $(cell).parent().before("<tr class='grid-cat'><td id='" + id_cat + "' row='" + row + "' style='display:none;'>" + $(objGroups[id_cat]).html() + "</td></tr>");
+                        $(cell).parent().before("<tr class='grid-cat'><td id='" + id_cat + "' class='mrShowText' row='" + row + "' style='display:none;'>" + $(objGroups[id_cat]).html() + "</td></tr>");
                     }
 
                     if(Object.keys(objCats).indexOf(id_cat) == -1){
                         id_cat = id_cat.substring(0, id_cat.lastIndexOf('.') + 1) + "1";
                     }
+                    
+                    var $chk = undefined;
 
-                    $chk = $(cell).find('input[type=checkbox]');
+                    if($(cell).find('input[type=checkbox]').length == 1){
+                        $chk = $(cell).find('input[type=checkbox]');
+                    } else if($(cell).find('input[type=radio]').length == 1){
+                        $chk = $(cell).find('input[type=radio]');
+                    }
 
-                    $chk.after("<label for='" + $chk.prop('id') + "'>" + $(objCats[id_cat]).html() + "</label>");
-                
+                    if($chk != undefined){
+                        $chk.after("<label for='" + $chk.prop('id') + "'>" + $(objCats[id_cat]).html() + "</label>");
+                        
+                        if($chk.hasClass('mrSingle'))
+                        {
+                            $chk.addClass('cat-single-item');
+                        } 
+                        if($chk.hasClass('mrMultiple'))      
+                        {
+                            $chk.addClass('cat-multiple-item');
+                        }
+                        
+                        if($(cell).find('input[type=text]').length == 1){
+                            $other = $(cell).find('input[type=text]');
+                            
+                            obj_catothers[$(cell).prop('id')] = $(cell);
+                            $other.addClass('cat-other');
+
+                            $other.hide();
+
+                            if($chk.is(':checked')){
+                                $other.show();
+                            }
+                        }
+
+                        if($(cell).find('.mrQuestionText').length == 1){
+                            $exclusive = $(cell).find('.mrQuestionText');
+
+                            if($exclusive.css('font-weight') == "700")
+                            {
+                                obj_catexclusives[$(cell).prop('id')] = $(cell);
+
+                                $(cell).find('.cat-group').addClass('exclusive');
+                                $exclusive.addClass('exclusive');
+                            }
+                        }
+
+                        if(Object.keys(obj_catothers).indexOf($(cell).prop('id')) == -1 && Object.keys(obj_catexclusives).indexOf($(cell).prop('id')) == -1){
+                            obj_cats[$(cell).prop('id')] = $(cell);
+                        }
+                    }
+
+                    var flag = false;
+
+                    if(!$(cell).parent().is('tr:last')){
+                        var $next_cell = $(cell).parent().next().find('td');
+            
+                        next_row = $next_cell.prop('id').substring($next_cell.prop('id').lastIndexOf('.') + 1, $next_cell.prop('id').length); 
+
+                        if(row != next_row) flag = true;
+                    } else if($(cell).parent().is('tr:last')){
+                        flag = true;
+                    }
+                    
+                    if(flag){
+                        objRows[row] = {
+                            'row' : obj_row,
+                            'cats' : obj_cats,
+                            'catothers' : obj_catothers,
+                            'catexclusives' : obj_catexclusives
+                        }
+
+                        obj_row = {};
+                        obj_cats = {};
+                        obj_catothers = {};
+                        obj_catexclusives = {};
+                    }
+                    
                     $(cell).hide()
                 } else {
                     if($(cell).find('.mrQuestionText').length == 1){
@@ -102,43 +175,194 @@ $(document).ready(function(){
                             $td.removeAttr('rowspan');
                         } else {
                             $(cell).parent().addClass('grid-attr');
-    
+                            
+                            if($(cell).find('.mrErrorText').length == 1){
+                                $(cell).find('.mrErrorText').hide();
+                                $(cell).parent().removeClass('bg-primary');
+                                $(cell).parent().addClass('bg-danger');
+                            } else {
+                                $(cell).parent().addClass('bg-primary');
+                                $(cell).parent().removeClass('bg-danger');
+                            }
+
                             if($td.prop('colspan') != 1){
                                 step = $td.prop('colspan') - 1;
                                 $td.removeAttr('colspan');
                             } else {
                                 step = $td.prop('id').split('.')[1];
                             }
+
+                            $(cell).parent().addClass('grid-content');
+                            
+                            obj_row = $(cell);
                         }
-                        
-                        $(cell).parent().addClass('grid-content');
-                        $(cell).parent().addClass('content-primary');
                     }
                 }
             });
             
+            console.log(objRows);
             break;
     }
 
+    $('input:submit').click(function(event){
+        
+        if(event["currentTarget"].className == "mrNext"){
+            
+            Object.keys(objRows).forEach(function(row){
+
+                var result_row = false;
+                var $grid_attr = undefined;
+
+                Object.keys(objRows[row]).forEach(function(cats){
+
+                    if(cats != 'row'){
+                        Object.keys(objRows[row][cats]).forEach(function(cat){
+
+                            var $cat = $(objRows[row][cats][cat]);
+    
+                            if($cat.find('input[type=checkbox]').is(':checked')){
+                                result_row = true;
+                            }
+                        });
+                    } else {
+                        $grid_attr = $(objRows[row]['row']);
+                    }
+                });
+
+                if(result_row){
+                    //Attribute is answered.
+                    $grid_attr.parent().addClass('bg-primary');
+                    $grid_attr.parent().removeClass('bg-danger');
+                } else {
+                    //Attribute is not answered.
+                    $grid_attr.parent().removeClass('bg-primary');
+                    $grid_attr.parent().addClass('bg-danger');
+                }
+            });
+        }
+    });
+    
     $('.grid-attr').click(function(event){
         
-        var id_attr = $(this).find('.mrGridCategoryText').prop('id').split('.');
+        var cur_row = $(this).find('.mrGridCategoryText').prop('id').split('.')[2];
 
-        $('.grid-cat').get().map(function(cat){
-            var $td = $(cat).find('td');
+        $(".mrQuestionTable tbody .grid-cat td").hide();
 
-            var id_cat = $td.prop('id').split('.');
-            
-            if(id_attr[2] == $td.attr('row')){
-                
-                if($td.is(':visible')){
-                    $td.hide();
-                } else {
-                    $td.show();
-                }
-            } else {
-                $td.hide();
+        Object.keys(objRows[cur_row]).forEach(function(cats){
+
+            if(cats != 'row'){
+                Object.keys(objRows[cur_row][cats]).forEach(function(cat){
+
+                    var $cat = $(objRows[cur_row][cats][cat]);
+    
+                    if($cat.is(':visible')){
+                        $cat.hide();
+                    } else {
+                        $cat.show();
+                    } 
+                });
             }
         });
+
+        Object.keys(objRows).forEach(function(row){
+            if(cur_row != row){
+                var result_row = false;
+                var $grid_attr = undefined;
+
+                Object.keys(objRows[row]).forEach(function(cats){
+
+                    if(cats != 'row'){
+                        Object.keys(objRows[row][cats]).forEach(function(cat){
+
+                            var $cat = $(objRows[row][cats][cat]);
+
+                            if($cat.find('input[type=checkbox]').is(':checked')){
+                                result_row = true;
+                            }
+                        });
+                    } else {
+                        $grid_attr = $(objRows[row]['row']);
+                    }
+                });
+
+                if(result_row){
+                    //Attribute is answered.
+                    $grid_attr.parent().addClass('bg-primary');
+                    $grid_attr.parent().removeClass('bg-danger');
+                } else {
+                    //Attribute is not answered.
+                    $grid_attr.parent().removeClass('bg-primary');
+                    $grid_attr.parent().addClass('bg-danger');
+                }
+            }
+        });
+    });
+
+    $('.cat-single-item').change(function(event){
+        
+        var $cat = $(this).parent().parent();
+        var $other = $cat.find('.cat-other');
+        $other.show();
+
+        var row = $cat.attr('row');
+        
+        $.each(objRows[row]['catothers'], function(key, cat){
+            
+            if(key != $cat.prop('id')) {
+
+                $oth = cat.find('.cat-other');
+                $oth.hide();
+                $oth.val("");
+
+                $err = cat.find('.mrErrorText');
+                $err.hide();
+            }
+        });
+    });
+
+    $('.cat-multiple-item').change(function(event){
+        
+        var $cat = $(this).parent().parent();
+        var $other = $cat.find('.cat-other');
+
+        var row = $cat.attr('row');
+
+        if($(this).is(':checked')){
+            $other.show();
+
+            if($cat.find('.cat-group').hasClass('exclusive')) {
+                
+                $.each(objRows[row]['cats'], function(key, cat){
+                    cat.find('.cat-multiple-item').prop('checked', false);
+                });
+
+                $.each(objRows[row]['catothers'], function(key, cat){
+                    cat.find('.cat-multiple-item').prop('checked', false);
+
+                    var $oth = cat.find('.cat-other');
+                    $oth.hide();
+                    $oth.val("");
+
+                    cat.find('.mrErrorText').hide();
+                });
+
+                $.each(objRows[row]['catexclusives'], function(key, cat){
+                    
+                    if($cat.prop('id') != key){
+                        cat.find('.cat-multiple-item').prop('checked', false);
+                    }
+                });
+            } else {
+                
+                $.each(objRows[row]['catexclusives'], function(key, cat){
+                    cat.find('.cat-multiple-item').prop('checked', false);
+                });
+            }
+        } else {
+            $other.hide();
+            $other.val("");
+
+            $other.hide();
+        }
     });
 });
