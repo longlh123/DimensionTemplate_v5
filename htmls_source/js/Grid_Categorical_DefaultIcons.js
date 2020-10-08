@@ -65,7 +65,7 @@ $(document).ready(function(){
             var step = 0;
             
             var row = -1, next_now = -1;
-            var obj_row = {}, obj_cats = {}, obj_catothers = {}, obj_catexclusives = {};
+            var obj_row = {}, obj_cats = {}, obj_catothers = {}, obj_catexclusives = {}, obj_subgroups = {};
 
             $(".mrQuestionTable tbody tr td").get().map(function(cell){
                 
@@ -81,7 +81,9 @@ $(document).ready(function(){
                     id_cat = id_cat.substring(0, id_cat.lastIndexOf('.') + 1) + "0";
                     
                     if(Object.keys(objGroups).indexOf(id_cat) != -1){
-                        $(cell).parent().before("<tr class='grid-cat'><td id='" + id_cat + "' class='mrShowText' row='" + row + "' style='display:none;'>" + $(objGroups[id_cat]).html() + "</td></tr>");
+                        $(cell).parent().before("<tr class='grid-cat'><td id='" + (id_cat + "." + row) + "' class='mrShowText' row='" + row + "' style='display:none;'>" + $(objGroups[id_cat]).html() + "</td></tr>");
+
+                        obj_subgroups[id_cat + "." + row] = $(cell).parent().prev().find('td');
                     }
 
                     if(Object.keys(objCats).indexOf(id_cat) == -1){
@@ -155,13 +157,15 @@ $(document).ready(function(){
                             'row' : obj_row,
                             'cats' : obj_cats,
                             'catothers' : obj_catothers,
-                            'catexclusives' : obj_catexclusives
+                            'catexclusives' : obj_catexclusives,
+                            'subgroups' : obj_subgroups
                         }
 
                         obj_row = {};
                         obj_cats = {};
                         obj_catothers = {};
                         obj_catexclusives = {};
+                        obj_subgroups = {};
                     }
                     
                     $(cell).hide()
@@ -248,7 +252,11 @@ $(document).ready(function(){
 
         $(".mrQuestionTable tbody .grid-cat td").hide();
 
+        var $grid_attr = undefined;
+
         Object.keys(objRows[cur_row]).forEach(function(cats){
+
+            $grid_attr = $(objRows[cur_row]['row']);
 
             if(cats != 'row'){
                 Object.keys(objRows[cur_row][cats]).forEach(function(cat){
@@ -258,17 +266,22 @@ $(document).ready(function(){
                     if($cat.is(':visible')){
                         $cat.hide();
                     } else {
+                        $grid_attr.parent().addClass('bg-primary');
+                        $grid_attr.parent().removeClass('bg-danger');
+
                         $cat.show();
                     } 
                 });
             }
         });
 
+        var count_error = 0;
+
         Object.keys(objRows).forEach(function(row){
             if(cur_row != row){
                 var result_row = false;
-                var $grid_attr = undefined;
-
+                $grid_attr = undefined;
+                
                 Object.keys(objRows[row]).forEach(function(cats){
 
                     if(cats != 'row'){
@@ -277,6 +290,8 @@ $(document).ready(function(){
                             var $cat = $(objRows[row][cats][cat]);
 
                             if($cat.find('input[type=checkbox]').is(':checked')){
+                                result_row = true;
+                            } else if($cat.find('input[type=radio]').is(':checked')){
                                 result_row = true;
                             }
                         });
@@ -291,11 +306,28 @@ $(document).ready(function(){
                     $grid_attr.parent().removeClass('bg-danger');
                 } else {
                     //Attribute is not answered.
+                    count_error++;
+
                     $grid_attr.parent().removeClass('bg-primary');
                     $grid_attr.parent().addClass('bg-danger');
+
+                    if(count_error == 1){
+                        $('.error').show();
+
+                        if(objRows[row]['row'].find('.mrErrorText').length){
+                            str_attr = objRows[row]['row'].find('.mrQuestionText').html();
+                            str_error = objRows[row]['row'].find('.mrErrorText').html();
+    
+                            var msg_error = "Câu '" + str_attr + "' (" + row + "): " + str_error
+    
+                            $('.error').find('.mrErrorText').html(msg_error);
+                        }
+                    }
                 }
             }
         });
+
+        if(count_error == 0) $('.error').hide();
     });
 
     $('.cat-single-item').change(function(event){
