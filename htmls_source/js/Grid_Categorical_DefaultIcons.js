@@ -27,10 +27,22 @@ $(document).ready(function(){
             });
             
             $.each($cells, function(index, cell){
-                if($(cell).prop('colspan') > 1){
-                    objGroups[$(cell).prop('id')] = $(cell);
-                } else {
-                    objCats[$(cell).prop('id')] = $(cell); 
+                switch(number_of_rows){
+                    case 2:
+                        //parseInt($(cell).prop('id').split('.')[2])
+                        if($(cell).prop('colspan') > 1 || ($(cell).prop('colspan') == 1 && $(cell).prop('rowspan') == 1 && parseInt($(cell).prop('id').split('.')[2]) == 0)){
+                            objGroups[$(cell).prop('id')] = $(cell);
+                        } else {
+                            objCats[$(cell).prop('id')] = $(cell); 
+                        }
+                        break;
+                    default:
+                        if($(cell).prop('colspan') > 1){
+                            objGroups[$(cell).prop('id')] = $(cell);
+                        } else {
+                            objCats[$(cell).prop('id')] = $(cell); 
+                        }
+                        break;
                 }
             });
 
@@ -45,7 +57,7 @@ $(document).ready(function(){
 
             //console.log($cells);
             //console.log(objGroups);
-            //console.log(objCats);
+            console.log(objCats);
 
             $(".mrQuestionTable tbody tr:first").remove();
             
@@ -88,8 +100,12 @@ $(document).ready(function(){
 
                     if(Object.keys(objCats).indexOf(id_cat) == -1){
                         id_cat = id_cat.substring(0, id_cat.lastIndexOf('.') + 1) + "1";
+
+                        if(Object.keys(objCats).indexOf(id_cat) == -1){
+                            id_cat = id_cat.substring(0, id_cat.lastIndexOf('.') + 1) + "2";
+                        }
                     }
-                    
+
                     var $chk = undefined;
 
                     if($(cell).find('input[type=checkbox]').length == 1){
