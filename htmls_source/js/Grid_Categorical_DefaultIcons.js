@@ -37,6 +37,19 @@ $(document).ready(function(){
                         }
                         break;
                     default:
+                        var text = $(cell).find('.mrQuestionText').html();
+                        var regExp = new RegExp("<img.*?>");
+                                    
+                        if(regExp.test(text)){
+                            var s1 = text.replace(regExp, "");
+                            var s2 = text.replace(s1, "");
+
+                            s1 = s1.replace(/<.*?(\/>)/, "");
+                            s1 = s1.replace(/<.*?(>)/, "");
+                            
+                            $(cell).find('.mrQuestionText').html("<div><div>" + s2 + "</div><div>" + s1 + "</div></div>");
+                        }
+
                         if($(cell).prop('colspan') > 1){
                             objGroups[$(cell).prop('id')] = $(cell);
                         } else {
